@@ -36,8 +36,19 @@ export const generateEventContent = async (eventName: string, speakerName: strin
     const responseText = chatCompletion.choices[0]?.message?.content || '{}';
     const parsed = JSON.parse(responseText);
 
-    const description = Array.isArray(parsed.description) ? parsed.description.join('\n\n') : (parsed.description || '');
-    const speakerIntro = Array.isArray(parsed.speakerIntro) ? parsed.speakerIntro.join('\n\n') : (parsed.speakerIntro || '');
+    const normalizeString = (val: any): string => {
+      if (!val) return '';
+      if (typeof val === 'string') return val;
+      if (Array.isArray(val)) return val.join('\n\n');
+      if (typeof val === 'object') {
+        if (val.text && typeof val.text === 'string') return val.text;
+        return JSON.stringify(val);
+      }
+      return String(val);
+    };
+
+    const description = normalizeString(parsed.description);
+    const speakerIntro = normalizeString(parsed.speakerIntro);
 
     return {
       description,
