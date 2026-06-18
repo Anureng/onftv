@@ -6,7 +6,14 @@ import { IEvent } from '@/lib/schema';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { CalendarIcon, UserIcon, TrashIcon, EditIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -82,41 +89,50 @@ export default function Dashboard() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event) => (
-            <Card key={event._id} className="flex flex-col">
-              <CardHeader>
-                <CardTitle>{event.eventName}</CardTitle>
-                <CardDescription className="flex items-center gap-2">
-                  <CalendarIcon className="h-4 w-4" />
-                  {format(new Date(event.eventDate), 'PPP')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-grow space-y-4">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <UserIcon className="h-4 w-4" />
-                  <span className="font-medium">{event.speakerName}</span> - {event.speakerDesignation}
-                </div>
-                {event.description && (
-                  <div className="text-sm text-gray-500 line-clamp-3">
-                    {event.description}
-                  </div>
-                )}
-              </CardContent>
-              <CardFooter className="flex justify-end gap-2 border-t pt-4">
-                <Link href={`/edit/${event._id}`}>
-                  <Button variant="outline" size="sm">
-                    <EditIcon className="h-4 w-4 mr-2" />
-                    Edit
-                  </Button>
-                </Link>
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(event._id)}>
-                  <TrashIcon className="h-4 w-4 mr-2" />
-                  Delete
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+        <div className="rounded-md border bg-white shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader className="bg-gray-50">
+              <TableRow>
+                <TableHead>Event Name</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Speaker</TableHead>
+                <TableHead>Designation</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredEvents.map((event) => (
+                <TableRow key={event._id}>
+                  <TableCell className="font-medium">{event.eventName}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-gray-500 whitespace-nowrap">
+                      <CalendarIcon className="h-4 w-4 mr-2" />
+                      {format(new Date(event.eventDate), 'PPP')}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center whitespace-nowrap">
+                      <UserIcon className="h-4 w-4 mr-2 text-gray-400" />
+                      {event.speakerName}
+                    </div>
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">{event.speakerDesignation}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Link href={`/edit/${event._id}`}>
+                        <Button variant="outline" size="sm" title="Edit Event">
+                          <EditIcon className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                      <Button variant="destructive" size="sm" title="Delete Event" onClick={() => handleDelete(event._id)}>
+                        <TrashIcon className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>
