@@ -7,7 +7,7 @@ import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarIcon, UserIcon, TrashIcon, EditIcon, FileTextIcon } from 'lucide-react';
+import { CalendarIcon, UserIcon, TrashIcon, EditIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -16,20 +16,19 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchEvents = async () => {
-    try {
-      const response = await api.get('/events');
-      if (response.data.success) {
-        setEvents(response.data.data);
-      }
-    } catch (error) {
-      toast.error('Failed to fetch events');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await api.get('/events');
+        if (response.data.success) {
+          setEvents(response.data.data);
+        }
+      } catch {
+        toast.error('Failed to fetch events');
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchEvents();
   }, []);
 
@@ -41,7 +40,7 @@ export default function Dashboard() {
         toast.success('Event deleted successfully');
         setEvents(events.filter(e => e._id !== id));
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete event');
     }
   };

@@ -6,7 +6,8 @@ import { EventForm } from '@/components/EventForm';
 import { EventFormValues, IEvent } from '@/lib/schema';
 import api from '@/lib/api';
 import { toast } from 'sonner';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { isAxiosError } from 'axios';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SparklesIcon, DownloadIcon } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -28,7 +29,7 @@ export default function EditEvent() {
         if (response.data.success) {
           setEventData(response.data.data);
         }
-      } catch (error) {
+      } catch {
         toast.error('Failed to fetch event details');
         router.push('/');
       }
@@ -44,8 +45,12 @@ export default function EditEvent() {
         toast.success('Event updated successfully');
         router.push('/');
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update event');
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Failed to update event');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +79,7 @@ export default function EditEvent() {
           toast.success('AI content generated and saved successfully!');
         }
       }
-    } catch (error: any) {
+    } catch {
       toast.error('Failed to generate AI content');
     } finally {
       setIsGenerating(false);
@@ -100,7 +105,7 @@ export default function EditEvent() {
       ],
     });
 
-    let currentY = (doc as any).lastAutoTable.finalY + 10;
+    let currentY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
 
     if (eventData.description) {
       doc.setFontSize(14);

@@ -6,6 +6,7 @@ import { EventForm } from '@/components/EventForm';
 import { EventFormValues } from '@/lib/schema';
 import api from '@/lib/api';
 import { toast } from 'sonner';
+import { isAxiosError } from 'axios';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function CreateEvent() {
@@ -21,8 +22,12 @@ export default function CreateEvent() {
         
         router.push('/');
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to create event');
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Failed to create event');
+      }
     } finally {
       setIsLoading(false);
     }
